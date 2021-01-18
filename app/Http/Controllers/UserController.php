@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendOrderEmail;
 use App\Models\Invite;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Notifications\InviteNotification;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -91,13 +90,18 @@ class UserController extends Controller
       $token = Str::random(20);
     } while (Invite::where('token', $token)->first());
 
-    Notification::route('mail', $request->email)->notify(new InviteNotification($token));
+    SendOrderEmail::dispatch($token);
+
     Invite::create([
       'token' => $token,
       'email' => $request->input('email')
     ]);
 
-    return ['success' => 'The Invite has been sent successfully'];
+    if (Mail::failures() != 0) {
+      return ['success' => "Success! Your Invitation has been sent."];
+    } else {
+      return ['failure' => "Failed! Your E-mail has not sent."];
+    }
   }
 
   public function registration($token, $request)
@@ -117,6 +121,9 @@ class UserController extends Controller
       'email' => $invite->email,
       'password' => $request->password
     ];
+
+    $invite->delete();
+
     User::create($user);
 
     $response = [

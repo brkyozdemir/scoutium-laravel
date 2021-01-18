@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\SendEmailJob;
 use Illuminate\Support\Facades\Route;
 
 /*

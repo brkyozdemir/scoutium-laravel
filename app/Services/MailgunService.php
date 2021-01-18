@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types=1);
 
-namespace App\Mail;
+namespace App\Services;
 
-use App\Interfaces\Repositories\Mail\IMailgunRepository;
-use App\Interfaces\Services\Mail\IMailgunService;
+use App\Interfaces\Repositories\IMailgunRepository;
+use App\Interfaces\Services\IMailgunService;
 
 class MailgunService implements IMailgunService
 {
