@@ -2,11 +2,9 @@
 
 namespace App\Providers;
 
-use App\Mail\IMailgunRepository;
-use App\Mail\IMailgunService;
-use App\Mail\MailgunRepository;
-use App\Mail\MailgunService;
 use Illuminate\Support\ServiceProvider;
+use App\Interfaces\Services\IUserService;
+use App\Services\UserService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,8 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        app()->bind(IMailgunService::class, MailgunService::class);
-        app()->bind(IMailgunRepository::class, MailgunRepository::class);
+        app()->bind(IUserService::class, UserService::class);
     }
 
 

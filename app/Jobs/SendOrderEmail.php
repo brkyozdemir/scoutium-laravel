@@ -36,12 +36,12 @@ class SendOrderEmail implements ShouldQueue
      */
     public function handle()
     {
-        Redis::throttle('any_key')->allow(10)->every(60)->then(function () {
+        Redis::throttle('scoutium_key')->allow(10)->every(60)->then(function () {
             $recipient = 'berkayozdemir02@gmail.com';
             Mail::to($recipient)->send(new FirstEmail($this->token));
             Log::info('Emailed token ' . $this->token);
         }, function () {
-            // Could not obtain lock; this job will be re-queued
+            
             return $this->release(10);
         });
     }

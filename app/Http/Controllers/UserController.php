@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendOrderEmail;
-use App\Models\Invite;
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use App\Interfaces\Services\IUserService;
+use App\Models\Invite;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+
+  private $userService;
+
+  public function __construct(IUserService $userService)
+  {
+    $this->userService = $userService;
+  }
 
   public function login(Request $request)
   {
@@ -25,56 +28,42 @@ class UserController extends Controller
       return response()->json($validator->errors(), 418);
     }
 
-    $user = User::where('email', $request->email)->first();
-    if (!$user || !Hash::check($request->password, $user->password)) {
-      return response([
-        'message' => ['These credentials do not match our records.']
-      ], 404);
-    }
+    dd(config('app.mal'));
 
-    $token = $user->createToken('scoutium')->plainTextToken;
-
-    $response = [
-      'user' => $user,
-      'token' => $token
-    ];
-
-    return response($response, 200);
+    $response = $this->userService->login($request);
+    return response(['deneme' => config('db.connection')], 200);
   }
 
   public function register(Request $request)
   {
-
     if ($request->token) {
-      return $this->registration($request->token, $request);
+      $validator = Validator::make($request->all(), [
+        'password' => 'required|min:6|max:12'
+      ]);
+
+      if ($validator->fails()) {
+        return response()->json($validator->errors(), 418);
+      }
     }
 
-    $validator = Validator::make($request->all(), [
-      'email' => 'required|email',
-      'password' => 'required|min:6|max:12'
-    ]);
+    if (!$request->token) {
+      $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required|min:6|max:12'
+      ]);
 
-    if ($validator->fails()) {
-      return response()->json($validator->errors(), 418);
+      if ($validator->fails()) {
+        return response()->json($validator->errors(), 418);
+      }
     }
 
-    $request['password'] = bcrypt($request['password']);
-    $user = [
-      'name' => $request->name,
-      'email' => $request->email,
-      'password' => $request->password
-    ];
-    User::create($user);
-
-    $response = [
-      'success' => 'User successfully created!'
-    ];
-
+    $response = $this->userService->register($request);
     return response($response, 201);
   }
 
   public function process_invites(Request $request)
   {
+
     $validator = Validator::make($request->all(), [
       'email' => 'required|email|unique:users,email'
     ]);
@@ -86,50 +75,8 @@ class UserController extends Controller
     if ($validator->fails()) {
       return response()->json($validator->errors(), 418);
     }
-    do {
-      $token = Str::random(20);
-    } while (Invite::where('token', $token)->first());
 
-    SendOrderEmail::dispatch($token);
-
-    Invite::create([
-      'token' => $token,
-      'email' => $request->input('email')
-    ]);
-
-    if (Mail::failures() != 0) {
-      return ['success' => "Success! Your Invitation has been sent."];
-    } else {
-      return ['failure' => "Failed! Your E-mail has not sent."];
-    }
-  }
-
-  public function registration($token, $request)
-  {
-    $invite = Invite::where('token', $token)->first();
-    $validator = Validator::make($request->all(), [
-      'password' => 'required|min:6|max:12'
-    ]);
-
-    if ($validator->fails()) {
-      return response()->json($validator->errors(), 418);
-    }
-
-    $request['password'] = bcrypt($request['password']);
-    $user = [
-      'name' => $request->name,
-      'email' => $invite->email,
-      'password' => $request->password
-    ];
-
-    $invite->delete();
-
-    User::create($user);
-
-    $response = [
-      'success' => 'User successfully created with token!'
-    ];
-
-    return response($response, 201);
+    $response = $this->userService->process_invites($request);
+    return response($response, 200);
   }
 }
