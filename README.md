@@ -1,5 +1,7 @@
 Do not forget to convert .env.example to .env
 
+You can either test it as `php artisan serve` or start a Wamp.net server
+
 # Configuring Environment Variables
 Create a db named 'laravel' and configure the environment variables
 
