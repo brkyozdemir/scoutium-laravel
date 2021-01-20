@@ -1,6 +1,7 @@
+Do not forget to convert .env.example to .env
 
 # Configuring Environment Variables
-- create a db named 'laravel' and configure the environment variables
+Create a db named 'laravel' and configure the environment variables
 
 ```
 DB_CONNECTION=mysql
@@ -11,7 +12,7 @@ DB_USERNAME=[db username]
 DB_PASSWORD=[db password]
 ```
 
-- configure your environment variables as your Mailgun credentials shown below
+Configure your environment variables as your Mailgun credentials shown below
 
 ```
 MAIL_MAILER=smtp
@@ -24,13 +25,13 @@ MAIL_FROM_NAME="${APP_NAME}"
 MAILGUN_DOMAIN=[your domain name]
 ```
 
-- as this is a test project, you cannot send any mails other your registered email in Mailgun. So, configure variable below with your email address
+As this is a test project, you cannot send any mails other your registered email in Mailgun. So, configure variable below with your email address
 
 ```
 MAIL_TO_ADDRESS=[your email]
 ```
 
-- as this uses redis, you have to change the variable below as it is 
+As this uses redis, you have to change the variable below as it is 
 
 ```
 QUEUE_CONNECTION=redis
