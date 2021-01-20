@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInvitesTable extends Migration
+class Users2TableNewColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,15 @@ class CreateInvitesTable extends Migration
      */
     public function up()
     {
-        Schema::create('invites', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('currency');
+            $table->integer('wallet');
             $table->string('email')->unique();
-            $table->string('token', 20)->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -28,6 +33,6 @@ class CreateInvitesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('invites');
+        Schema::dropIfExists('users');
     }
 }

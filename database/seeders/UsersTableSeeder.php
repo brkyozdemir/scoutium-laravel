@@ -19,7 +19,9 @@ class UsersTableSeeder extends Seeder
         $user = [
             'name' => 'Berkay',
             'email' => 'berkay@scoutium.com',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
+            'wallet' => 0,
+            'currency' => 'TRY'
         ];
         User::create($user);
     }

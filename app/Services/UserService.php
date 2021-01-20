@@ -43,9 +43,11 @@ class UserService implements IUserService
 
     $request['password'] = bcrypt($request['password']);
     $user = [
+      'currency' => 'TRY',
       'name' => $request->name,
       'email' => $request->email,
-      'password' => $request->password
+      'password' => $request->password,
+      'wallet' => 0,
     ];
     User::create($user);
 
@@ -58,15 +60,17 @@ class UserService implements IUserService
 
   public function process_invites(Request $request)
   {
-    
+
     do {
       $token = Str::random(20);
     } while (Invite::where('token', $token)->first());
 
-    SendOrderEmail::dispatch($token);
+    $to_email = env('MAIL_TO_ADDRESS');
+    SendOrderEmail::dispatch($token, $to_email);
 
     Invite::create([
       'token' => $token,
+      'sender' => $request->input('sender'),
       'email' => $request->input('email')
     ]);
 
@@ -83,17 +87,25 @@ class UserService implements IUserService
 
     $request['password'] = bcrypt($request['password']);
     $user = [
+      'currency' => 'TRY',
       'name' => $request->name,
       'email' => $invite->email,
-      'password' => $request->password
+      'password' => $request->password,
+      'wallet' => 30,
     ];
 
-    $invite->delete();
+    $sender = User::where('email', $invite->sender)->first();
+    $sender->wallet += 50;
+    $sender->save();
 
     User::create($user);
 
+    $invite->delete();
+
     $response = [
-      'success' => 'User successfully created with token!'
+      'message' => 'User successfully created with token!',
+      'user' => $user,
+      'sender' => $sender
     ];
 
     return $response;

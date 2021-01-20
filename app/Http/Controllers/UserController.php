@@ -28,10 +28,8 @@ class UserController extends Controller
       return response()->json($validator->errors(), 418);
     }
 
-    dd(config('app.mal'));
-
     $response = $this->userService->login($request);
-    return response(['deneme' => config('db.connection')], 200);
+    return response($response, 200);
   }
 
   public function register(Request $request)

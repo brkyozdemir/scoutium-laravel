@@ -13,7 +13,7 @@
   <div class="container">
     <div class="row">
       <div class="col-xl-6 col-lg-6 col-sm-12 m-auto">
-        <p> Hey, </p>
+        <p> Hey, Welcome to Scoutium!</p>
         <p> Your Invitation code: {{$token}}</p>
         <p> Best Regards</p>
         <p> Team, Scoutium </p>
