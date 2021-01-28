@@ -25,6 +25,11 @@ class User extends Authenticatable
         'currency'
     ];
 
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class);
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *

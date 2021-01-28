@@ -17,6 +17,10 @@ class UserController extends Controller
     $this->userService = $userService;
   }
 
+  public function getDeneme() {
+    return ['success' => 'helal sana'];
+  }
+
   public function login(Request $request)
   {
     $validator = Validator::make($request->all(), [
@@ -59,7 +63,7 @@ class UserController extends Controller
     return response($response, 201);
   }
 
-  public function process_invites(Request $request)
+  public function processInvites(Request $request)
   {
 
     $validator = Validator::make($request->all(), [
@@ -74,7 +78,7 @@ class UserController extends Controller
       return response()->json($validator->errors(), 418);
     }
 
-    $response = $this->userService->process_invites($request);
+    $response = $this->userService->processInvites($request);
     return response($response, 200);
   }
 }

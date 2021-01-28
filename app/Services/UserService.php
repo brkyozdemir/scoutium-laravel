@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Interfaces\Services\IUserService;
+use App\Models\Wallet as ModelsWallet;
+use Wallet;
 
 class UserService implements IUserService
 {
@@ -38,16 +40,23 @@ class UserService implements IUserService
   {
 
     if ($request->token) {
-      return $this->register_with_token($request->token, $request);
+      return $this->registerWithToken($request->token, $request);
     }
 
     $request['password'] = bcrypt($request['password']);
+
+    $wallet = ModelsWallet::create([
+      'amount' => 0,
+      'email' => $request->email,
+      'currency' => 'TRY'
+    ]);
+
     $user = [
       'currency' => 'TRY',
       'name' => $request->name,
       'email' => $request->email,
       'password' => $request->password,
-      'wallet' => 0,
+      'wallet' => $wallet->id,
     ];
     User::create($user);
 
@@ -55,10 +64,10 @@ class UserService implements IUserService
       'success' => 'User successfully created!'
     ];
 
-    return $response;
+    return $user;
   }
 
-  public function process_invites(Request $request)
+  public function processInvites(Request $request)
   {
 
     do {
@@ -81,31 +90,51 @@ class UserService implements IUserService
     }
   }
 
-  public function register_with_token($token, Request $request)
+  public function registerWithToken($token, Request $request)
   {
     $invite = Invite::where('token', $token)->first();
 
     $request['password'] = bcrypt($request['password']);
+
+    $invitedUserWallet = ModelsWallet::create([
+      'amount' => 30,
+      'currency' => 'TRY',
+      'email' => $invite->email
+    ]);
+
     $user = [
       'currency' => 'TRY',
       'name' => $request->name,
       'email' => $invite->email,
       'password' => $request->password,
-      'wallet' => 30,
+      'wallet' => $invitedUserWallet->id,
     ];
 
     $sender = User::where('email', $invite->sender)->first();
-    $sender->wallet += 50;
-    $sender->save();
+    $senderWallet = ModelsWallet::where('email', $invite->sender)->first();
+    $senderWallet->amount += 50;
+    $senderWallet->save();
 
     User::create($user);
 
     $invite->delete();
 
+    $invitedUser = [
+      'name' => $request->name,
+      'email' => $invite->email,
+      'wallet' => $invitedUserWallet
+    ];
+
+    $senderUser = [
+      'name' => $sender->name,
+      'email' => $sender->email,
+      'wallet' => $senderWallet
+    ];
+
     $response = [
       'message' => 'User successfully created with token!',
-      'user' => $user,
-      'sender' => $sender
+      'user' => $invitedUser,
+      'sender' => $senderUser
     ];
 
     return $response;

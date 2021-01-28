@@ -21,10 +21,11 @@ use App\Http\Controllers\UserController;
 // });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('users/invite', [UserController::class, 'process_invites']);
+    Route::get('users/invite', [UserController::class, 'processInvites']);
 });
 
 Route::post('register', [UserController::class, 'register']);
 
 Route::post('login', [UserController::class, 'login']);
 
+Route::get('get-all', [UserController::class, 'getDeneme']);
