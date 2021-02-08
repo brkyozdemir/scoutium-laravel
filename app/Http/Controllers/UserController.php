@@ -17,7 +17,8 @@ class UserController extends Controller
     $this->userService = $userService;
   }
 
-  public function getDeneme() {
+  public function getDeneme()
+  {
     return ['success' => 'helal sana'];
   }
 

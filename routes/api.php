@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\RegistrationController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\CovidController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
@@ -16,10 +15,6 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users/invite', [UserController::class, 'processInvites']);
 });
@@ -29,3 +24,6 @@ Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 
 Route::get('get-all', [UserController::class, 'getDeneme']);
+
+Route::get('get-usa', [CovidController::class, 'getTurkey']);
+Route::get('get-finance', [CovidController::class, 'getFinance']);
